@@ -1,46 +1,101 @@
-# Compus QA Collection
+<p align="center">
+  <a href="#readme">English</a>
+</p>
 
-This repository is the combined Campus/Compus QA collection. It keeps the full evolution path from a base RAG demo to the final memory-enhanced system.
+<h1 align="center">CampusQA-Collection</h1>
 
-## Projects
+<p align="center">
+  <em>"A teachable evolution map from RAG QA to HyperMemory."</em>
+</p>
 
-| Folder | Role |
+<p align="center">
+  <img alt="Collection" src="https://img.shields.io/badge/Type-Collection-111827">
+  <img alt="Tutorial" src="https://img.shields.io/badge/Mode-Tutorial-2563EB">
+  <img alt="Diff" src="https://img.shields.io/badge/Compare-Version%20Diff-7C3AED">
+  <img alt="Docker" src="https://img.shields.io/badge/Run-Docker%20Compose-2496ED?logo=docker&logoColor=white">
+</p>
+
+<p align="center">
+  This is the special repository in the family: it keeps every method side by side and explains what changed between them.
+</p>
+
+| Base RAG | HyperMemory |
 | --- | --- |
-| `rag_qa` | Base RAG QA. |
-| `rag_agent` | RAG QA with an agent layer. |
-| `llm_wiki` | RAG + Agent + LLM Wiki memory. |
-| `gbrain` | LLM Wiki plus GBrain skill concepts. |
-| `hierarchy_memory` | GBrain plus hierarchy memory. |
-| `hyper_memory` | Full version with hierarchy memory and hyper memory. |
+| ![CampusRAG-QA](docs/assets/screenshots/campus-rag-dashboard.png) | ![HyperMemory](docs/assets/screenshots/hypermemory-mode.png) |
 
-## Architecture
+## What Is Inside
 
-All projects share the same basic architecture:
+| Folder | Stage | Key idea |
+| --- | --- | --- |
+| `rag_qa` | 1 | Base document RAG. |
+| `rag_agent` | 2 | Adds agent tool calling. |
+| `llm_wiki` | 3 | Adds wiki-style memory from documents. |
+| `gbrain` | 4 | Adds a skill layer on top of wiki memory. |
+| `hierarchy_memory` | 5 | Adds layered conversation and wiki memory. |
+| `hyper_memory` | 6 | Adds the final HyperMemory aggregation layer. |
 
-- Spring Boot backend for ingestion and chat APIs.
-- Vue 3 frontend for upload and chat interaction.
-- MySQL for document metadata.
-- Redis for cache/memory infrastructure.
-- MinIO for uploaded files.
-- Milvus for vector storage.
-- LangChain4j for embeddings, chat model calls, and agent/tool concepts.
+## How To Use This Repository
 
-## Run A Project
-
-Enter one project folder and start its stack:
+Run any stage independently:
 
 ```bash
-docker compose up -d
+cd rag_qa
+cp .env.example .env
+docker compose up -d --build
 ```
 
-Then open:
+The default URLs are:
 
 - Frontend: `http://localhost:3000`
-- Backend: `http://localhost:8080`
+- Backend health: `http://localhost:8080/actuator/health`
 
-The projects use the same default ports, so run one at a time unless ports are changed.
+Only run one stage at a time unless you change `FRONTEND_PORT`, `BACKEND_PORT`, and the database/storage ports.
 
-## Final System
+## Tutorial And Comparison Plan
 
-The most complete campus-oriented version is `hyper_memory`. A market-oriented standalone version is published separately as `HyperMemory`.
+CampusQA-Collection is designed to become a GitHub Pages tutorial site. The site will let readers select any two stages and see:
 
+- Added controllers and endpoints.
+- Added services and memory layers.
+- Frontend mode changes.
+- Docker/runtime changes.
+- Key code paths to inspect next.
+
+Local comparison script:
+
+```powershell
+.\tools\compare-versions.ps1 -From rag_qa -To hyper_memory
+```
+
+Static tutorial site source:
+
+```text
+docs-site/
+```
+
+Main planning documents:
+
+- [Roadmap](docs/ROADMAP.md)
+- [Version matrix](docs/VERSION-MATRIX.md)
+- [Comparison guide](docs/COMPARISON-GUIDE.md)
+- [Operations guide](docs/OPERATIONS.md)
+
+## Evolution Map
+
+```mermaid
+flowchart LR
+    A[RAG QA] --> B[RAG Agent]
+    B --> C[LLM Wiki]
+    C --> D[GBrain]
+    D --> E[Hierarchy Memory]
+    E --> F[HyperMemory]
+```
+
+## Current Engineering Improvements
+
+- Every stage now has a Vite `index.html`.
+- Docker frontend images proxy `/api` through nginx to the backend.
+- Runtime configuration is documented in `.env.example`.
+- Docker Compose uses configurable ports and health checks.
+- Spring Boot actuator health/info endpoints are exposed.
+- Screenshots and tutorial docs are included at the collection root.
