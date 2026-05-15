@@ -43,6 +43,8 @@ Set `OPENAI_API_KEY` in `.env` before using model-backed chat.
 | `BOT_FEISHU_ENABLED` | Enables the Feishu channel. |
 | `BOT_DINGTALK_ENABLED` | Enables the DingTalk channel. |
 | `BOT_WECHAT_ENABLED` | Enables the WeChat channel. |
+| `BOT_IDEMPOTENCY_ENABLED` | Enables duplicate message detection via Redis. Defaults to `true`. |
+| `BOT_IDEMPOTENCY_TTL_SECONDS` | TTL in seconds for idempotency keys. Defaults to `600`. |
 
 ## Bot Gateway Smoke Test
 
@@ -57,6 +59,6 @@ curl -i http://localhost:8080/actuator/health
 - Protect `/api/gbrain/skills/run-all` before exposing it to shared users.
 - Persist wiki and skill state outside in-memory maps.
 - Add source citation payloads for frontend rendering.
-- Add idempotency storage for Bot message IDs before enabling platform retries.
+- ~~Add idempotency storage for Bot message IDs before enabling platform retries.~~ Done: `BotIdempotencyService` acquires a Redis `SETNX` key by `(tenantId, channel, messageId)` before dispatch. Concurrent duplicates are ignored, successful messages keep the key until TTL expiry, and processing exceptions release the key so platform retries can run again. Missing `tenantId` defaults to `"default"`. Set `BOT_IDEMPOTENCY_ENABLED=false` to disable.
 - Add RBAC around `tenantId`, allowed modes, and document namespace.
 - Add observability for retrieval latency, model latency, and tool calls.
