@@ -14,9 +14,10 @@ CampusAgent-QA is the agentic product in the three-repository set. It combines t
 | Agent behavior | Removed hardcoded FAQ answers; the agent now relies on retrieval tools for knowledge answers. |
 | GBrain | Replaced placeholder console skills with deterministic inspection skills and structured names. |
 | Documentation | Added operations notes, architecture map, and production checklist. |
-| CI | Added GitHub Actions jobs for frontend build and backend Maven tests. |
+| CI | Added GitHub Actions jobs for frontend build, backend Maven tests, Compose config validation, and Docker image builds. |
 | Bot integration | Added a disabled-by-default Bot gateway for Feishu, DingTalk, and WeChat adapters. |
 | Observability | Added Prometheus metrics exposure and graceful shutdown settings. |
+| Deployment hardening | Kubernetes manifests now separate runtime config from secrets and include startup probes plus non-root container security settings. |
 
 ## Highest-Impact Next Work
 
@@ -27,10 +28,10 @@ CampusAgent-QA is the agentic product in the three-repository set. It combines t
 | P1 | Add tool-call trace output | Operators need to see which tools the agent used. |
 | P1 | Add Bot idempotency storage | Prevents duplicate platform retries from creating duplicate model calls. |
 | P2 | Add versioned skill definitions | Skills need lifecycle, owner, schedule, and audit fields. |
-| P2 | Expand CI with Docker Compose smoke tests | Verifies the whole runtime, not only builds. |
+| P2 | Add an authenticated staging smoke environment | Verifies agent/tool behavior with real dependencies and guarded secrets. |
 
 ## Known Tradeoffs
 
-- This repository intentionally stops before HyperMemory; hierarchy and hyper aggregation live in `Harzva/HyperMemory`.
+- This repository intentionally stops before HyperMemory; final hyper aggregation lives in `Harzva/HyperMemory`.
 - The current runtime still uses MySQL, Milvus, MinIO, and Redis for the Docker demo.
 - The backend sends one completed SSE event; the frontend can consume streaming chunks once the model layer is upgraded.
