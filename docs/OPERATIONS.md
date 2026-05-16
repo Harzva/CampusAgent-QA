@@ -28,6 +28,10 @@ Set `OPENAI_API_KEY` in `.env` before using model-backed chat.
 | GBrain | `/api/gbrain/chat` | `/api/wiki/upload` | Skill layer over wiki memory. |
 | Bot Gateway | `/api/bot/{channel}/callback` | N/A | Normalized Feishu, DingTalk, and WeChat callbacks. |
 
+## Tenant Scoping
+
+Uploads accept an optional `tenantId` form field. Chat and `with-sources` JSON requests accept an optional `tenantId` body field. Missing values are normalized to `default`; retrieval tools and wiki lookups only hydrate chunks owned by that tenant.
+
 ## Runtime Configuration
 
 | Variable | Purpose |
@@ -60,7 +64,8 @@ curl -i http://localhost:8080/actuator/health
 
 - Protect `/api/gbrain/skills/run-all` before exposing it to shared users.
 - Persist wiki and skill state outside in-memory maps.
-- ~~Add source citation payloads for frontend rendering.~~ Done: `AnswerWithSources` DTO returned from `/api/chat/with-sources` and `/api/wiki/chat/with-sources`. Bot gateway responses (`BotMessageResponse`) now include an optional `sources` list for `rag` and `wiki` modes. `agent` and `gbrain` modes remain answer-only.
+- ~~Add source citation payloads for frontend rendering.~~ Done: `AnswerWithSources` DTO returned from `/api/chat/with-sources` and `/api/wiki/chat/with-sources`. Bot gateway responses (`BotMessageResponse`) now include an optional `sources` list for `rag` and `wiki` modes. `agent` and `gbrain` modes remain answer-only but tenant-scoped.
+- ~~Add tenant-scoped retrieval boundary.~~ Done: uploads persist `tenantId`, RAG/Wiki/Agent/GBrain/Bot retrieval filters hydrated chunks by tenant, and missing tenant values default to `default`.
 - ~~Add idempotency storage for Bot message IDs before enabling platform retries.~~ Done: `BotIdempotencyService` acquires a Redis `SETNX` key by `(tenantId, channel, messageId)` before dispatch. Concurrent duplicates are ignored, successful messages keep the key until TTL expiry, and processing exceptions release the key so platform retries can run again. Missing `tenantId` defaults to `"default"`. Set `BOT_IDEMPOTENCY_ENABLED=false` to disable.
-- Add RBAC around `tenantId`, allowed modes, and document namespace.
+- Add RBAC for user-to-tenant membership and admin-only document namespace management.
 - Add observability for retrieval latency, model latency, and tool calls.
